@@ -1,7 +1,7 @@
 
 # [투비소프트] Nexacro N 기본
 ## <넥사크로스튜디오 구조 설명>
-1. environment에서
+1. environment
   - varialbles :  localbrowser에 저장되는데 생성된 변수는 지워주지 않은 이상은 계속 남게됨(보안에 문제가 있을수있음), 평문으로 남음
   - cookies :  세션 변수는 jsessionid에 정의해줌(값은 서버에서 넣음)
   - http header : 추가적인 해더값을 넣고 싶을때 추가하여 사용
