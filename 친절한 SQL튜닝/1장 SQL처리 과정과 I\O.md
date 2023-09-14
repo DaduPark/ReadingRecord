@@ -26,4 +26,34 @@
 ### 1.1.4 옵티마이저 힌트 
 - 개발자가 데이터 엑세스 경로를 바꾸는 것
 - 사용 예) select /*+ INDEX(A 고객_PK)*/ 컬럼명...;
- 
+- 주의사항
+  -  ','(콤마)는 힌트 안의 인자를 나열할때만 쓰고 힌트와 힌트 사이 사용은 안된다.
+  -  테이블 ALIAS 지정 시, 힌트에도 반드시 ALIAS 사용
+- 기왕 힌트를 사용 한다면 빈틈없이 기술해야 한다.
+<img height="400" alt="image" src="https://github.com/DaduPark/ReadingRecord/assets/76692927/673d612e-cf3f-4719-8516-d87434655116">
+<img height="400" alt="image" src="https://github.com/DaduPark/ReadingRecord/assets/76692927/632e2195-fdd9-4579-af97-67a2cc95fb89">
+
+---
+## 1.2 SQL 공유 및 재사용
+### 1.2.1 소프트파싱 VS 하드파싱
+- 라이브러리 캐시(Library Cache)
+  - SQL 파싱, 최적호, 로우 소스 생성과정을 거쳐 생성한 내부 프로시저를 반복 재사용 할 수 있도록 캐싱 해두는 메모리 공간
+  - SGA 구성요소
+- SQL실행 순서 : SQL이 라이브러리 캐시에 존재하는지 확인  
+  <img height="150" alt="image" src="https://github.com/DaduPark/ReadingRecord/assets/76692927/a9e2f6c3-d0bb-4028-b8da-79d5417483c0">  
+- 소프트 파싱 : SQL을 캐시에서 찾아 바로 실행단계로 진행
+- 하드 파싱 : 캐시에서 찾지 못하여 최적화 및 로우 생성 단계까지 모두 거치는 것
+   - 최적화에서 엄청나게 많은 연산을 진행하여 CPU가 많은 소비가 된다(라이브러리 캐시가 필요한 이유)
+### 1.2.2 바인드 변수의 중요성
+- 사용자 정의함수, 프로시저, 트리거, 패키지 등은 생성할때 부터 **이름**을 가져 딕셔너리에 저장되며 영구 보관된다. 그러므로 라이브러리 캐시에 적재하여 재사용된다.
+- SQL은 텍스트 전체가 이름 역할 즉, 작은 부분이라도 수정되면 다른 객체로 탄생됨(SQL ID도 변한다)
+- 하단 예시는 모두 다른 ID로 처리됨 => **하드 파싱**처리됨
+  ```sql
+  select * from emp where empno = 11;
+  Select * from emp where empno = 11;
+  select * from emp where empno = 12;  
+  ```
+- **바인드 변수**를 사용함으로써 캐싱된 SQL을 사용자마다 공유하여 하드파싱은 한번만 일어난다.
+  ```sql
+  select * from emp where empno = :empno;
+  ```
